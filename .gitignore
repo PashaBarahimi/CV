@@ -1,0 +1,35 @@
+# LaTeX auxiliary files
+*.aux
+*.log
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.toc
+*.bbl
+*.blg
+*.run.xml
+*.bcf
+*.nav
+*.snm
+*.vrb
+*.lof
+*.lot
+*.xdv
+
+# Built PDFs are deliberately NOT committed: CI publishes them as artifacts and
+# attaches them to releases (see .github/workflows/build.yml). Committing the
+# PDF makes every content change a binary diff and invites the committed copy
+# to drift from the source.
+cv.pdf
+cv-letter.pdf
+
+# Editor / OS noise
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Python bytecode from tools/
+__pycache__/
+*.pyc

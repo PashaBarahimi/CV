@@ -1,0 +1,108 @@
+name: Build CV
+
+# Every action and image below is pinned to an exact release. Reproducibility
+# over freshness: this build should still work unchanged in a year. To upgrade,
+# bump a version here deliberately and check the run.
+#
+# Note on the artifact actions: upload-artifact v7 pairs with download-artifact
+# v7. download-artifact v8 removed the `name` input, so do not bump one without
+# the other.
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# Rapid pushes shouldn't queue redundant builds.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Compile and verify
+    runs-on: ubuntu-24.04
+    outputs:
+      artifact: ${{ steps.naming.outputs.artifact }}
+      pdf: ${{ steps.naming.outputs.pdf }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+
+      - name: Compute artifact name
+        id: naming
+        run: |
+          short="${GITHUB_SHA::7}"
+          echo "artifact=cv-${short}" >> "$GITHUB_OUTPUT"
+          echo "pdf=cv-${short}.pdf"  >> "$GITHUB_OUTPUT"
+
+      - name: Compile cv.tex
+        # latexmk picks up ./.latexmkrc, which sets -halt-on-error, so a LaTeX
+        # error fails this step rather than producing a broken PDF and exit 0.
+        # The texlive-full image already carries every package cvstyle.cls
+        # needs; the non-obvious ones are xcharter, fontsize, fontawesome5,
+        # needspace, lastpage and microtype.
+        uses: xu-cheng/latex-action@4.1.0
+        with:
+          root_file: cv.tex
+          latexmk_use_xelatex: false
+          texlive_version: 2026
+
+      - name: Install poppler-utils
+        # verify-pdf.py shells out to pdfinfo and pdftotext.
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends poppler-utils
+
+      - name: Verify the rendered PDF
+        # Asserts the page count, that no heading is stranded at the foot of a
+        # page, that every date uses the canonical format, that the running
+        # header is present on pages 2+ and absent on page 1, that the metadata
+        # is populated, and that the LaTeX log is free of undefined references
+        # and oversized overfull boxes.
+        run: python3 tools/verify-pdf.py cv.pdf cv.log
+
+      - name: Rename PDF
+        run: cp cv.pdf "${{ steps.naming.outputs.pdf }}"
+
+      - name: Upload PDF
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: ${{ steps.naming.outputs.artifact }}
+          path: ${{ steps.naming.outputs.pdf }}
+          if-no-files-found: error
+          retention-days: 90
+
+  release:
+    name: Attach PDF to release
+    # Only on a v* tag. Everything else stops at the artifact above.
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-24.04
+    # Write scope is granted here and nowhere else in the workflow.
+    permissions:
+      contents: write
+    steps:
+      - name: Download built PDF
+        uses: actions/download-artifact@v7.0.0
+        with:
+          name: ${{ needs.build.outputs.artifact }}
+
+      - name: Create release and attach PDF
+        # Uses the bundled gh CLI rather than a third-party release action, so
+        # there is one less external dependency to pin and trust.
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PDF: ${{ needs.build.outputs.pdf }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --title "CV ${GITHUB_REF_NAME}" \
+            --notes "Automated build of ${GITHUB_REF_NAME}." \
+            "${PDF}"

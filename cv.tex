@@ -1,0 +1,46 @@
+%% cv.tex -- master document.
+%%
+%% All design lives in cvstyle.cls; all content lives in sections/.
+%% Build with `make` (or `latexmk -pdf cv.tex`). See README.md.
+%%
+%% For a US Letter build:  make letter
+%% (which passes the `letterpaper` class option; do not edit this line).
+
+\documentclass{cvstyle}
+
+\begin{document}
+
+\input{sections/header}
+
+\cvsection{Education}
+\input{sections/education}
+
+\cvsection{Research Interests}
+\input{sections/research-interests}
+
+\cvsection{Publications}
+\input{sections/publications}
+
+\cvsection{Research Experience}
+\input{sections/research-experience}
+
+\cvsection{Work Experience}
+\input{sections/work-experience}
+
+\cvsection{Teaching Experience}
+\input{sections/teaching}
+
+\cvsection{Honors and Awards}
+\input{sections/honors}
+
+% \cvsection{Selected Projects}
+% \input{sections/projects}
+
+\cvsection{Skills \& Languages}
+\input{sections/skills}
+
+% Foot of the final page. Date comes from the build, so CI stamps the day the
+% CV was last pushed.
+\cvlastupdated
+
+\end{document}

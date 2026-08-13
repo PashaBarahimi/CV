@@ -1,0 +1,78 @@
+%% Research Experience -- reverse chronological.
+
+\cvevent
+  {Research Assistant}
+  {\cvinst{https://www.usc.edu/}{University of Southern California}}
+  {Jun 2026 -- Present}
+  {Quantitative Evaluation and Design (QED) group}
+\cvadvisor[Viterbi Fellowship]{\cvlink{https://viterbi.usc.edu/directory/faculty/Golubchik/Leana}{Prof.\ Leana Golubchik}}
+\begin{cvitems}
+  \cvitem{Studying adversarial robustness of resource allocation algorithms in
+          LEO satellite networks; under review at IEEE INFOCOM 2027.}
+\end{cvitems}
+
+\cvevent
+  {Research Assistant}
+  {\cvinst{https://www.usc.edu/}{University of Southern California}}
+  {Mar 2026 -- Jun 2026}
+  {}
+\cvadvisor[Viterbi Fellowship]{\cvlink{https://www.isi.edu/people-sravi/}{Prof.\ Srivatsan Ravi}}
+\cvsummary{Exploring trust-minimizing protocols for conditional payments.}
+\begin{cvitems}
+  \cvitem{Implemented and gas-benchmarked a Solidity hashed timelock contract
+          for conditional payments, deployed on an Ethereum testnet.}
+  % \cvitem{Demonstrated failure modes in LLM guardrails for agent-to-agent
+  %         systems, including prompt injection concealed in benign content.}
+\end{cvitems}
+
+\cvevent
+  {Bachelor's Thesis}
+  {\cvinst{https://ut.ac.ir/en}{University of Tehran}}
+  {Oct 2024 -- Sep 2025}
+  {``Analysis of Data from Decentralized Exchanges and Automated Market Makers''}
+\cvadvisor{\cvlink{https://ece.ut.ac.ir/en/~p.shariatpanahi}{Prof.\ Seyed Pooya Shariatpanahi}}
+\begin{cvitems}
+  \cvitem{Collected and analyzed 44.9 million Uniswap swaps on Ethereum
+          (protocol versions v2--v4) spanning Sep 2024 -- Mar 2025, through a
+          purpose-built GraphQL scraper feeding a SQLite store processed with
+          Apache Spark.}
+  \cvitem{Detected anomalous market behavior: wash trading, arbitrage
+          patterns, bot-like repeated swaps at short intervals, and USD-value
+          outliers.}
+  \cvitem{Predicted hourly price direction for five actively traded tokens
+          using XGBoost, LightGBM, and random forests, reaching 62--66\% test
+          accuracy against a balanced \cvapprox{}50\% baseline.}
+\end{cvitems}
+
+\cvevent
+  {Research Intern}
+  {\cvinst{https://www.utoronto.ca/}{University of Toronto} (Remote)}
+  {Aug 2024 -- Sep 2024}
+  {}
+\cvadvisor{\cvlink{https://www.cs.toronto.edu/~fanl/}{Prof.\ Fan Long}}
+\begin{cvitems}
+  \cvitem{Developed a Rust algorithm for the \cvlink{https://github.com/jeffchen006/heimdall-rs}{Heimdall}
+          toolkit to detect self-reverting storage slots --- reentrancy guards
+          and cache slots --- enabling detection of reentrancy vulnerability
+          patterns.}
+  \cvitem{Resolved an ambiguity in symbolic execution where unknown storage
+          values were indistinguishable from genuine zero values, by supplying
+          initial slot values.}
+  \cvitem{Results contributed to the ICSE~2026 paper listed above.}
+\end{cvitems}
+
+\cvevent
+  {Research Intern}
+  {\cvinst{https://www.mpi-sws.org/}{Max Planck Institute for Software Systems (MPI-SWS)}}
+  {Jul 2023 -- Sep 2023}
+  {}
+\cvadvisor{\cvlink{https://people.mpi-sws.org/~rupak/}{Prof.\ Rupak Majumdar}}
+\begin{cvitems}
+  \cvitem{Co-implemented the \cvlink{https://plv.mpi-sws.org/genmc/popl2022-trust.pdf}{TruSt}
+          dynamic partial-order reduction (DPOR) algorithm within
+          \cvlink{https://github.com/rupakm/lincheck/}{Lincheck}, a model
+          checker for concurrent data structures on the JVM (Java, Kotlin).}
+  \cvitem{Established that the approach was blocked by shared-variable identity
+          on the JVM under garbage collection, and documented the analysis for
+          future work.}
+\end{cvitems}
