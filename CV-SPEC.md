@@ -228,8 +228,16 @@ tags, manual dispatch. Concurrency keyed on the ref with `cancel-in-progress`.
 1. Compile with `xu-cheng/latex-action@4.1.0`, `texlive_version: 2026`.
 2. Install `poppler-utils`, then run `tools/verify-pdf.py`.
 3. Upload the PDF as `cv-<short-sha>.pdf`, retained 90 days.
-4. On a `v*` tag only, create a Release and attach the PDF via the bundled `gh`
-   CLI — one fewer third-party action to pin.
+4. Create a Release and attach the PDF via the bundled `gh` CLI — one fewer
+   third-party action to pin. Runs on a `v*` tag, or on a manual dispatch with
+   the `release` input set.
+
+The manual path derives its tag from the UTC date as `vYY.MM.DD`, appending
+`-2`, `-3` … if that tag already exists. `gh release create --target` creates
+the tag at the built commit, so no checkout or `git push` is needed; on a tag
+push the tag already exists and the target is ignored. A tag created this way
+does not re-trigger the workflow, because pushes made with `GITHUB_TOKEN` do
+not start new runs.
 
 Workflow permissions are `contents: read`; only the release job is granted
 `contents: write`.

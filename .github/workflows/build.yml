@@ -15,6 +15,11 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      release:
+        description: "Tag vYY.MM.DD and publish a release"
+        type: boolean
+        default: false
 
 # Rapid pushes shouldn't queue redundant builds.
 concurrency:
@@ -81,8 +86,9 @@ jobs:
 
   release:
     name: Attach PDF to release
-    # Only on a v* tag. Everything else stops at the artifact above.
-    if: startsWith(github.ref, 'refs/tags/v')
+    # Two ways in: pushing a v* tag, or ticking the box on a manual run.
+    # Everything else stops at the artifact above.
+    if: startsWith(github.ref, 'refs/tags/v') || inputs.release
     needs: build
     runs-on: ubuntu-24.04
     # Write scope is granted here and nowhere else in the workflow.
@@ -94,15 +100,41 @@ jobs:
         with:
           name: ${{ needs.build.outputs.artifact }}
 
+      - name: Resolve tag name
+        # On a tag push the name is given. On a manual run it is derived from
+        # the date, and a suffix is appended if that tag already exists so a
+        # second release on the same day cannot collide.
+        id: tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            echo "name=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          base="v$(date -u +%y.%m.%d)"
+          tag="$base"
+          n=2
+          while gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${tag}" >/dev/null 2>&1; do
+            tag="${base}-${n}"
+            n=$((n + 1))
+          done
+          echo "name=${tag}" >> "$GITHUB_OUTPUT"
+
       - name: Create release and attach PDF
         # Uses the bundled gh CLI rather than a third-party release action, so
-        # there is one less external dependency to pin and trust.
+        # there is one less external dependency to pin and trust. --target
+        # creates the tag at this commit when it does not already exist, which
+        # is what lets a manual run tag and release in one step; for a tag push
+        # the tag exists and the target is ignored.
         env:
           GH_TOKEN: ${{ github.token }}
           PDF: ${{ needs.build.outputs.pdf }}
+          TAG: ${{ steps.tag.outputs.name }}
         run: |
-          gh release create "${GITHUB_REF_NAME}" \
+          gh release create "${TAG}" \
             --repo "${GITHUB_REPOSITORY}" \
-            --title "CV ${GITHUB_REF_NAME}" \
-            --notes "Automated build of ${GITHUB_REF_NAME}." \
+            --target "${GITHUB_SHA}" \
+            --title "CV ${TAG}" \
+            --notes "Automated build of ${TAG}." \
             "${PDF}"

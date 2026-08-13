@@ -85,17 +85,26 @@ other.
    TeX Live pinned to `2026`.
 2. Runs `tools/verify-pdf.py`, which fails the build on any check violation.
 3. Uploads the PDF as `cv-<short-sha>.pdf`, retained 90 days.
-4. On a `v*` tag only, creates a GitHub Release and attaches the PDF. That job
-   is the only one granted `contents: write`.
+4. Publishes a GitHub Release with the PDF attached, on a `v*` tag or a manual
+   run with the release box ticked. That job is the only one granted
+   `contents: write`.
 
 A LaTeX error fails the build rather than producing a broken PDF: `.latexmkrc`
 sets `-halt-on-error`, so `latexmk` cannot exit 0 on a broken document.
 
-To cut a release:
+### Cutting a release
+
+Either run the workflow from the Actions tab with **"Tag vYY.MM.DD and publish
+a release"** ticked — the tag is derived from today's date (`v26.08.13`), and
+gains a `-2`, `-3` suffix if that tag already exists — or tag by hand:
 
 ```sh
 git tag v1.0 && git push origin v1.0
 ```
+
+Release assets do not expire, unlike the 90-day build artifacts. A tag created
+by the workflow does not itself re-trigger the workflow, since pushes made with
+`GITHUB_TOKEN` do not start new runs.
 
 ### What `make verify` checks
 
