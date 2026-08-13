@@ -228,9 +228,13 @@ tags, manual dispatch. Concurrency keyed on the ref with `cancel-in-progress`.
 1. Compile with `xu-cheng/latex-action@4.1.0`, `texlive_version: 2026`.
 2. Install `poppler-utils`, then run `tools/verify-pdf.py`.
 3. Upload the PDF as `cv-<short-sha>.pdf`, retained 90 days.
-4. Create a Release and attach the PDF via the bundled `gh` CLI — one fewer
-   third-party action to pin. Runs on a `v*` tag, or on a manual dispatch with
-   the `release` input set.
+4. Create a Release and attach the PDF as `cv.pdf` via the bundled `gh` CLI —
+   one fewer third-party action to pin. Runs on a `v*` tag, or on a manual
+   dispatch with the `release` input set.
+
+Build artifacts stay sha-stamped so runs can be told apart; the release asset is
+renamed to `cv.pdf` so that `releases/latest/download/cv.pdf` is a permanent,
+login-free URL for the current version.
 
 The manual path derives its tag from the UTC date as `vYY.MM.DD`, appending
 `-2`, `-3` … if that tag already exists. `gh release create --target` creates

@@ -127,14 +127,20 @@ jobs:
         # creates the tag at this commit when it does not already exist, which
         # is what lets a manual run tag and release in one step; for a tag push
         # the tag exists and the target is ignored.
+        #
+        # The asset is renamed to cv.pdf first. Build artifacts stay sha-stamped
+        # so runs can be told apart, but a release asset should have a
+        # predictable download URL: .../releases/download/<tag>/cv.pdf, and
+        # .../releases/latest/download/cv.pdf for the current one.
         env:
           GH_TOKEN: ${{ github.token }}
           PDF: ${{ needs.build.outputs.pdf }}
           TAG: ${{ steps.tag.outputs.name }}
         run: |
+          mv "${PDF}" cv.pdf
           gh release create "${TAG}" \
             --repo "${GITHUB_REPOSITORY}" \
             --target "${GITHUB_SHA}" \
             --title "CV ${TAG}" \
             --notes "Automated build of ${TAG}." \
-            "${PDF}"
+            cv.pdf

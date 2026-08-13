@@ -102,9 +102,18 @@ gains a `-2`, `-3` suffix if that tag already exists — or tag by hand:
 git tag v1.0 && git push origin v1.0
 ```
 
-Release assets do not expire, unlike the 90-day build artifacts. A tag created
-by the workflow does not itself re-trigger the workflow, since pushes made with
-`GITHUB_TOKEN` do not start new runs.
+Release assets do not expire, unlike the 90-day build artifacts, and the asset
+is always named `cv.pdf`, so a release gives you a permanent link:
+
+```
+https://github.com/<owner>/<repo>/releases/latest/download/cv.pdf
+```
+
+That URL always serves the most recent release — use it for a lab page or an
+email signature rather than an artifact link, which expires and needs a login.
+
+A tag created by the workflow does not itself re-trigger the workflow, since
+pushes made with `GITHUB_TOKEN` do not start new runs.
 
 ### What `make verify` checks
 
