@@ -23,6 +23,7 @@
 # to drift from the source.
 cv.pdf
 cv-letter.pdf
+cv-ats.pdf
 
 # Editor / OS noise
 .vscode/

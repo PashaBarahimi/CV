@@ -1,0 +1,43 @@
+%% cv-ats.tex -- ATS-safe variant.
+%%
+%% Same content files as cv.tex, rendered by cvats.cls instead of cvstyle.cls.
+%% Keep the section list here in step with cv.tex.
+%%
+%% Build with `make ats`.
+
+\documentclass{cvats}
+
+\begin{document}
+
+\input{sections/header}
+
+\cvsection{Education}
+\input{sections/education}
+
+\cvsection{Research Interests}
+\input{sections/research-interests}
+
+\cvsection{Publications}
+\input{sections/publications}
+
+\cvsection{Research Experience}
+\input{sections/research-experience}
+
+\cvsection{Work Experience}
+\input{sections/work-experience}
+
+\cvsection{Teaching Experience}
+\input{sections/teaching}
+
+\cvsection{Honors and Awards}
+\input{sections/honors}
+
+% \cvsection{Selected Projects}
+% \input{sections/projects}
+
+\cvsection{Skills \& Languages}
+\input{sections/skills}
+
+\cvlastupdated
+
+\end{document}

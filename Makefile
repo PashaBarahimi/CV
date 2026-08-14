@@ -8,12 +8,18 @@ PYTHON  ?= python3
 
 SOURCES := $(MAIN).tex cvstyle.cls $(wildcard sections/*.tex)
 
-.PHONY: all letter watch verify clean distclean help
+.PHONY: all ats letter watch verify clean distclean help
 
 all: $(MAIN).pdf
 
 $(MAIN).pdf: $(SOURCES)
 	$(LATEXMK) -pdf $(MAIN).tex
+
+# ATS-safe variant: same sections/, rendered by cvats.cls. Verified on text
+# extraction rather than on layout, since that is the whole point of it.
+ats:
+	$(LATEXMK) -pdf cv-ats.tex
+	@$(PYTHON) tools/verify-ats.py cv-ats.pdf
 
 # US Letter variant. cv.tex names no paper size, so the option is injected on
 # the command line rather than edited into the source.
@@ -42,13 +48,16 @@ verify:
 clean:
 	$(LATEXMK) -c $(MAIN).tex
 	-$(LATEXMK) -c -jobname=$(MAIN)-letter $(MAIN).tex
+	-$(LATEXMK) -c cv-ats.tex
 
 distclean:
 	$(LATEXMK) -C $(MAIN).tex
 	-$(LATEXMK) -C -jobname=$(MAIN)-letter $(MAIN).tex
+	-$(LATEXMK) -C cv-ats.tex
 
 help:
 	@echo "make            build cv.pdf (A4)"
+	@echo "make ats        build cv-ats.pdf (ATS-safe, plain text layout)"
 	@echo "make letter     build cv-letter.pdf (US Letter)"
 	@echo "make watch      continuous rebuild + preview"
 	@echo "make verify     build, then run the CV-SPEC acceptance tests"

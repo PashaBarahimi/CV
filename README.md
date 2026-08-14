@@ -15,6 +15,7 @@ formatting code — only semantic macros. If you find yourself typing `\vspace` 
 make            # build cv.pdf (A4)
 make verify     # build, then run the checks
 make watch      # continuous rebuild + preview while editing
+make ats        # build cv-ats.pdf (ATS-safe, for industry applications)
 make letter     # build cv-letter.pdf (US Letter)
 make clean      # remove auxiliary files
 make distclean  # remove auxiliary files and the PDFs
@@ -65,7 +66,18 @@ The header uses `\cvname`, `\cvtagline`, and inside `cvcontacts`:
 `\cvlastupdated` sits at the end of `cv.tex`.
 
 To reorder or add a section, edit `cv.tex` — it is just a list of
-`\cvsection` + `\input` pairs.
+`\cvsection` + `\input` pairs. `cv-ats.tex` has the same list; keep the two in
+step.
+
+## The ATS variant
+
+`make ats` renders the same `sections/*.tex` through `cvats.cls`: single
+column, no tables, no icons, no colour, contact lines spelled out as
+`Email:` / `GitHub:`, and dates on their own line. That layout is what lets an
+applicant-tracking system read the text in the right order.
+
+`tools/verify-ats.py` checks the extracted text rather than the page, so a
+change that quietly reintroduces column positioning is caught.
 
 Placeholders are meant to be conspicuous. Before sending the CV anywhere:
 

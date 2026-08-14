@@ -178,10 +178,12 @@ Header: `\cvname`, `\cvtagline`, and inside `cvcontacts` — `\cvemail`,
 ```
 cv.tex                     master document — section order lives here
 cvstyle.cls                all design decisions
+cv-ats.tex / cvats.cls     ATS-safe variant, same sections/ (sec. 11)
 .latexmkrc                 build settings, shared by local builds and CI
 sections/*.tex             content, one file per section
 tools/verify-pdf.py        the checks, run locally and in CI
-Makefile                   all / letter / watch / verify / clean / distclean
+tools/verify-ats.py        extraction checks for the ATS variant
+Makefile                   all / ats / letter / watch / verify / clean / distclean
 .github/workflows/build.yml
 ```
 
@@ -252,9 +254,36 @@ input, so do not bump one without the other.
 
 ---
 
-## 11. Deliberately not built
+## 11. ATS variant
 
-- **ATS variant** (single column, no icons, black only). Viable — the content
-  files are class-agnostic — but not implemented.
+`cv-ats.tex` + `cvats.cls`, built with `make ats`. It reuses `sections/*.tex`
+verbatim by implementing the same macro API; only the rendering differs. Keep
+the section list in `cv-ats.tex` in step with `cv.tex`.
+
+Everything about it serves text extraction:
+
+- Single column, **no tabular positioning anywhere**. Text in table cells is the
+  usual cause of scrambled extraction order, and a right-aligned date column is
+  the usual cause of dates attaching to the wrong entry.
+- Dates on their own line under the entry heading, not in a column.
+- No icon glyphs. Contact lines spell out `Email:`, `GitHub:` and so on, one per
+  line, with no middots or pipes to misparse.
+- Black only; body hyperlinks flattened to plain text. URLs worth having are in
+  the contact block, written out.
+- No letterspacing — `\textls` inserts kerns that can split a word into separate
+  runs on extraction.
+- No running header or footer; parsers routinely discard them.
+
+Verified by `tools/verify-ats.py` on the extracted text, not the layout: the
+contact labels are present, no icon font is embedded, no control characters
+appear, and no line shows the multi-space runs that indicate column positioning.
+
+The page limit does not apply — linear layout runs longer, and ATS submissions
+are not read the way an academic CV is.
+
+---
+
+## 12. Deliberately not built
+
 - **GitHub Pages publication** for a stable PDF URL. Artifacts expire after 90
   days and need a login; release assets do not expire and are the durable path.
