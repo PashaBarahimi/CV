@@ -1,0 +1,43 @@
+%% cv-industry.tex -- industry variant, for PhD internships in industry.
+%%
+%% Same class and same sections/ as cv.tex, with three differences:
+%%   - the `industry` class option, which turns on \cvindustry content;
+%%   - experience ahead of publications, since industry readers look there first;
+%%   - industry versions of Skills and Teaching (sections/*-industry.tex).
+%%
+%% Build with `make industry`. Held to the same checks as cv.tex, two pages
+%% included.
+
+\documentclass[industry]{cvstyle}
+
+\begin{document}
+
+\input{sections/header}
+
+\cvsection{Education}
+\input{sections/education}
+
+\cvsection{Research Interests}
+\input{sections/research-interests}
+
+\cvsection{Research Experience}
+\input{sections/research-experience}
+
+\cvsection{Work Experience}
+\input{sections/work-experience}
+
+\cvsection{Publications}
+\input{sections/publications}
+
+\cvsection{Skills \& Languages}
+\input{sections/skills-industry}
+
+\cvsection{Teaching Experience}
+\input{sections/teaching-industry}
+
+\cvsection{Honors and Awards}
+\input{sections/honors}
+
+\cvlastupdated
+
+\end{document}

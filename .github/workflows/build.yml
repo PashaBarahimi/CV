@@ -36,6 +36,7 @@ jobs:
     outputs:
       artifact: ${{ steps.naming.outputs.artifact }}
       pdf: ${{ steps.naming.outputs.pdf }}
+      pdf_industry: ${{ steps.naming.outputs.pdf_industry }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7.0.1
@@ -46,6 +47,7 @@ jobs:
           short="${GITHUB_SHA::7}"
           echo "artifact=cv-${short}" >> "$GITHUB_OUTPUT"
           echo "pdf=cv-${short}.pdf"  >> "$GITHUB_OUTPUT"
+          echo "pdf_industry=cv-industry-${short}.pdf" >> "$GITHUB_OUTPUT"
 
       - name: Compile cv.tex
         # latexmk picks up ./.latexmkrc, which sets -halt-on-error, so a LaTeX
@@ -56,6 +58,14 @@ jobs:
         uses: xu-cheng/latex-action@4.1.0
         with:
           root_file: cv.tex
+          latexmk_use_xelatex: false
+          texlive_version: 2026
+
+      - name: Compile cv-industry.tex
+        # The industry variant: same class and sections, different master file.
+        uses: xu-cheng/latex-action@4.1.0
+        with:
+          root_file: cv-industry.tex
           latexmk_use_xelatex: false
           texlive_version: 2026
 
@@ -73,14 +83,22 @@ jobs:
         # and oversized overfull boxes.
         run: python3 tools/verify-pdf.py cv.pdf cv.log
 
-      - name: Rename PDF
-        run: cp cv.pdf "${{ steps.naming.outputs.pdf }}"
+      - name: Verify the industry PDF
+        # Held to the same checks as the academic CV, two pages included.
+        run: python3 tools/verify-pdf.py cv-industry.pdf cv-industry.log
 
-      - name: Upload PDF
+      - name: Rename PDFs
+        run: |
+          cp cv.pdf "${{ steps.naming.outputs.pdf }}"
+          cp cv-industry.pdf "${{ steps.naming.outputs.pdf_industry }}"
+
+      - name: Upload PDFs
         uses: actions/upload-artifact@v7.0.1
         with:
           name: ${{ steps.naming.outputs.artifact }}
-          path: ${{ steps.naming.outputs.pdf }}
+          path: |
+            ${{ steps.naming.outputs.pdf }}
+            ${{ steps.naming.outputs.pdf_industry }}
           if-no-files-found: error
           retention-days: 90
 
@@ -135,12 +153,14 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           PDF: ${{ needs.build.outputs.pdf }}
+          PDF_INDUSTRY: ${{ needs.build.outputs.pdf_industry }}
           TAG: ${{ steps.tag.outputs.name }}
         run: |
           mv "${PDF}" cv.pdf
+          mv "${PDF_INDUSTRY}" cv-industry.pdf
           gh release create "${TAG}" \
             --repo "${GITHUB_REPOSITORY}" \
             --target "${GITHUB_SHA}" \
             --title "CV ${TAG}" \
             --notes "Automated build of ${TAG}." \
-            cv.pdf
+            cv.pdf cv-industry.pdf

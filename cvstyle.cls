@@ -22,10 +22,18 @@
 \newif\ifcv@letter \cv@letterfalse
 \DeclareOption{a4paper}{\cv@letterfalse}
 \DeclareOption{letterpaper}{\cv@lettertrue}
+% `industry` selects the industry variant (cv-industry.tex): content wrapped in
+% \cvindustry prints only when it is set.
+\newif\ifcv@industry \cv@industryfalse
+\DeclareOption{industry}{\cv@industrytrue}
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{article}}
 \ProcessOptions\relax
 
 \LoadClass[11pt]{article}
+
+% \cvindustry{...} -- content for the industry variant only: a bullet worth its
+% space on an industry CV but not on the academic one.
+\newcommand{\cvindustry}[1]{\ifcv@industry#1\fi}
 
 % ---------------------------------------------------------------------------
 % Packages

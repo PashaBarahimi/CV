@@ -21,10 +21,15 @@
 \newif\ifcv@letter \cv@letterfalse
 \DeclareOption{a4paper}{\cv@letterfalse}
 \DeclareOption{letterpaper}{\cv@lettertrue}
+\newif\ifcv@industry \cv@industryfalse
+\DeclareOption{industry}{\cv@industrytrue}
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{article}}
 \ProcessOptions\relax
 
 \LoadClass[11pt]{article}
+
+% Same as cvstyle.cls: prints only in the industry variant.
+\newcommand{\cvindustry}[1]{\ifcv@industry#1\fi}
 
 \RequirePackage{fix-cm}
 \RequirePackage[T1]{fontenc}

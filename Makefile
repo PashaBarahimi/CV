@@ -8,7 +8,7 @@ PYTHON  ?= python3
 
 SOURCES := $(MAIN).tex cvstyle.cls $(wildcard sections/*.tex)
 
-.PHONY: all ats letter watch verify clean distclean help
+.PHONY: all ats industry letter watch verify clean distclean help
 
 all: $(MAIN).pdf
 
@@ -20,6 +20,12 @@ $(MAIN).pdf: $(SOURCES)
 ats:
 	$(LATEXMK) -pdf cv-ats.tex
 	@$(PYTHON) tools/verify-ats.py cv-ats.pdf
+
+# Industry variant: same class and sections/, experience ahead of publications,
+# and industry versions of Skills and Teaching. Held to the same checks as cv.tex.
+industry:
+	$(LATEXMK) -pdf cv-industry.tex
+	@$(PYTHON) tools/verify-pdf.py cv-industry.pdf cv-industry.log
 
 # US Letter variant. cv.tex names no paper size, so the option is injected on
 # the command line rather than edited into the source.
@@ -49,15 +55,18 @@ clean:
 	$(LATEXMK) -c $(MAIN).tex
 	-$(LATEXMK) -c -jobname=$(MAIN)-letter $(MAIN).tex
 	-$(LATEXMK) -c cv-ats.tex
+	-$(LATEXMK) -c cv-industry.tex
 
 distclean:
 	$(LATEXMK) -C $(MAIN).tex
 	-$(LATEXMK) -C -jobname=$(MAIN)-letter $(MAIN).tex
 	-$(LATEXMK) -C cv-ats.tex
+	-$(LATEXMK) -C cv-industry.tex
 
 help:
 	@echo "make            build cv.pdf (A4)"
 	@echo "make ats        build cv-ats.pdf (ATS-safe, plain text layout)"
+	@echo "make industry   build cv-industry.pdf (industry variant) and check it"
 	@echo "make letter     build cv-letter.pdf (US Letter)"
 	@echo "make watch      continuous rebuild + preview"
 	@echo "make verify     build, then run the CV-SPEC acceptance tests"

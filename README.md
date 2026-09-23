@@ -16,6 +16,7 @@ make            # build cv.pdf (A4)
 make verify     # build, then run the checks
 make watch      # continuous rebuild + preview while editing
 make ats        # build cv-ats.pdf (ATS-safe, for industry applications)
+make industry   # build cv-industry.pdf (industry variant), then check it
 make letter     # build cv-letter.pdf (US Letter)
 make clean      # remove auxiliary files
 make distclean  # remove auxiliary files and the PDFs
@@ -59,6 +60,7 @@ Open the relevant file in `sections/` and use these macros.
 | `\Csharp` / `\Cpp` | Correctly kerned "C#" and "C++" — do not type `C\#`, it sets as "C #" |
 | `\cvapprox` | Upright text tilde for "approximately" |
 | `\cvtodo{note}` | A visible `[TODO: note]` placeholder |
+| `\cvindustry{...}` | Content printed only in the industry variant, e.g. `\cvindustry{\cvitem{...}}` |
 
 The header uses `\cvname`, `\cvtagline`, and inside `cvcontacts`:
 `\cvemail`, `\cvwebsite`, `\cvgithub`, `\cvlinkedin`, `\cvscholar`, `\cvorcid`,
@@ -67,7 +69,22 @@ The header uses `\cvname`, `\cvtagline`, and inside `cvcontacts`:
 
 To reorder or add a section, edit `cv.tex` — it is just a list of
 `\cvsection` + `\input` pairs. `cv-ats.tex` has the same list; keep the two in
-step.
+step. `cv-industry.tex` deliberately orders its sections differently.
+
+## The industry variant
+
+`make industry` builds `cv-industry.pdf`, a two-page version for industry
+internships. It uses the same `cvstyle.cls` and the same `sections/`, with
+three differences:
+
+- `cv-industry.tex` loads the class with the `industry` option, which turns on
+  anything wrapped in `\cvindustry{...}`. The academic builds skip it.
+- Experience comes before Publications.
+- Skills and Teaching come from `sections/skills-industry.tex` and
+  `sections/teaching-industry.tex`.
+
+Every other entry is shared, so an edit to it reaches both CVs. The industry
+variant is held to the same checks as `cv.tex`, two pages included.
 
 ## The ATS variant
 
@@ -93,11 +110,13 @@ grep -rn 'cvtodo' sections/
 `v*` tags, and on manual dispatch. Concurrent runs for the same ref cancel each
 other.
 
-1. Compiles `cv.tex` with `xu-cheng/latex-action`, pinned to `4.1.0` with
-   TeX Live pinned to `2026`.
-2. Runs `tools/verify-pdf.py`, which fails the build on any check violation.
-3. Uploads the PDF as `cv-<short-sha>.pdf`, retained 90 days.
-4. Publishes a GitHub Release with the PDF attached, on a `v*` tag or a manual
+1. Compiles `cv.tex` and `cv-industry.tex` with `xu-cheng/latex-action`,
+   pinned to `4.1.0` with TeX Live pinned to `2026`.
+2. Runs `tools/verify-pdf.py` on both, which fails the build on any check
+   violation.
+3. Uploads the PDFs as `cv-<short-sha>.pdf` and `cv-industry-<short-sha>.pdf`,
+   retained 90 days.
+4. Publishes a GitHub Release with both PDFs attached, on a `v*` tag or a manual
    run with the release box ticked. That job is the only one granted
    `contents: write`.
 
@@ -114,11 +133,13 @@ gains a `-2`, `-3` suffix if that tag already exists — or tag by hand:
 git tag v1.0 && git push origin v1.0
 ```
 
-Release assets do not expire, unlike the 90-day build artifacts, and the asset
-is always named `cv.pdf`, so a release gives you a permanent link:
+Release assets do not expire, unlike the 90-day build artifacts, and the assets
+are always named `cv.pdf` and `cv-industry.pdf`, so a release gives you
+permanent links:
 
 ```
 https://github.com/<owner>/<repo>/releases/latest/download/cv.pdf
+https://github.com/<owner>/<repo>/releases/latest/download/cv-industry.pdf
 ```
 
 That URL always serves the most recent release — use it for a lab page or an
